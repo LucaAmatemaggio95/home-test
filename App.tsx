@@ -1,98 +1,77 @@
-import * as React from 'react';
-import {
-  ColumnDirective,
-  ColumnsDirective,
-  GridComponent,
-  Filter,
-  Group,
-  Inject,
-  Page,
-  PageSettingsModel,
-  Sort,
-  Toolbar,
-  ColumnChooser,
-} from '@syncfusion/ej2-react-grids';
-import { ButtonComponent } from '@syncfusion/ej2-react-buttons';
+import React, { useEffect, useState } from 'react';
+
 import './style.css';
+import DataGrid from './components/DataGrid/DataGrid';
+import ShowGridButton from './components/ShowGridButton/ShowGridButton';
+import FetchDataButton from './components/FetchDataButton/FetchDataButton';
+import useDebounce from './utils/hooks';
+import { fetchData } from './utils/api';
 
 const App: React.FC = () => {
-  const [showGrid, setShowGrid] = React.useState<boolean>(true);
+  const [baseData, setBaseData] = useState([]);
+  const [gridData, setGridData] = useState([]);
 
-  const [pages] = React.useState({ pageSize: 5 });
-
-  const toolbarOptions = ['ColumnChooser'];
-
-  const [gridData, setGridData] = React.useState({});
-
-  const formatField = (field, data) => {
-    if (data[field] === null) {
-      return '--';
-    }
-    return data[field];
-  };
+  const [showGrid, setShowGrid] = useState<boolean>(true);
+  const [fetchFlag, setFetchFlag] = useState<boolean>(true);
+  const debouncedFlag = useDebounce<boolean>(fetchFlag, 500);
 
   const handleClickShow = () => {
     setShowGrid(!showGrid);
   };
 
-  const genderTemplate = (props) => {
-    return (
-      <span className="material-symbols-rounded">
-        {props.Gender === 'Male' ? 'man' : 'woman'}
-      </span>
-    );
+  const handleClickFetchData = () => {
+    setFetchFlag(!fetchFlag);
   };
 
-  React.useEffect(() => {
-    fetch(
-      'https://services.odata.org/TripPinRESTierService/(S(hespbvdrrmhquk5vqlzcpbro))/People'
-    )
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setGridData(data.value);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+  // filter the data based on Gender button
+  const filterGender = (args: any) => {
+    let filtered = [];
+
+    switch (args.item.id) {
+      case 'filterMale':
+        filtered = baseData.filter((i) => i.Gender === 'Male');
+
+        break;
+      case 'filterFemale':
+        filtered = baseData.filter((i) => i.Gender === 'Female');
+
+        break;
+      default:
+        filtered = baseData;
+        break;
+    }
+
+    setGridData(filtered);
+  };
+
+  const handleCleanUp = () => {
+    setBaseData([]);
+    setGridData([]);
+  };
+
+  // whenever the debounced flag changes value, fetch the data again
+  // this will work also on the first render
+  useEffect(() => {
+    const getData = async () => {
+      const data = await fetchData();
+      setBaseData(data);
+      setGridData(data);
+    };
+
+    getData();
+
+    return () => {
+      handleCleanUp();
+    };
+  }, [debouncedFlag]);
 
   return (
     <div>
-      <div>
-        <ButtonComponent className="buttonShow" onClick={handleClickShow}>
-          {showGrid ? 'hide' : 'show'}
-        </ButtonComponent>
+      <div className="btnBarContainer">
+        <ShowGridButton showGrid={showGrid} handleClick={handleClickShow} />
+        <FetchDataButton handleClick={handleClickFetchData} />
       </div>
-      {showGrid && (
-        <GridComponent
-          dataSource={gridData}
-          allowPaging={true}
-          pageSettings={pages}
-          toolbar={toolbarOptions}
-          showColumnChooser={true}
-        >
-          <ColumnsDirective>
-            <ColumnDirective field="FirstName" width="100" textAlign="Right" />
-            <ColumnDirective field="LastName" width="100" />
-            <ColumnDirective
-              field="Gender"
-              width="100"
-              textAlign="Right"
-              template={genderTemplate}
-            />
-            <ColumnDirective
-              field="Age"
-              width="100"
-              textAlign="Right"
-              valueAccessor={formatField}
-            />
-            <ColumnDirective field="Emails" width="100" textAlign="Right" />
-          </ColumnsDirective>
-          <Inject
-            services={[Toolbar, ColumnChooser, Page, Sort, Filter, Group]}
-          />
-        </GridComponent>
-      )}
+      {showGrid && <DataGrid data={gridData} filterGender={filterGender} />}
     </div>
   );
 };

@@ -1,1 +1,0 @@
-npm i @syncfusion/ej2-base
