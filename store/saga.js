@@ -1,5 +1,5 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
-import fetchData from './api.js';
+import fetchData from '../utils/api.js';
 import * as actions from '../store/actions.js';
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
