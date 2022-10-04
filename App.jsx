@@ -55,8 +55,7 @@ const App = () => {
     }
   };
 
-  // whenever the debounced flag changes value, fetch the data again
-  // this will work also on the first render
+  // get the data on the first render
   useEffect(() => {
     onFetchData();
 
