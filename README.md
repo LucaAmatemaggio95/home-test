@@ -11,7 +11,7 @@
 - [x] Introdurre due pulsanti per poter filtrare i gender
 - [x] Introdurre un pulsante per effettuare la GET dei dati con un debounce
 
-- [ ] Introdurre Redux e gestire le chiamate API tramite Redux-Saga
+- [x] Introdurre Redux e gestire le chiamate API tramite Redux-Saga
 - [ ] Gestire le email attraverso una child grid
 
 - [ ] Abilitare l’editing inline sulla riga(senza effettuare la patch a backend) ed in particolare sul campo Gender
