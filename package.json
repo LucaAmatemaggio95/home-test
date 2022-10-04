@@ -17,7 +17,11 @@
     "@types/react": "18.0.21",
     "@types/react-dom": "18.0.6",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-native": ">=0.59",
+    "react-redux": "^8.0.4",
+    "redux": "^4.2.0",
+    "redux-saga": "^1.2.1"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,5 +1,5 @@
 // fetch data from the API
-export const fetchData = async () => {
+const fetchData = async () => {
   try {
     const res = await fetch(
       'https://services.odata.org/TripPinRESTierService/(S(hespbvdrrmhquk5vqlzcpbro))/People'
@@ -10,3 +10,5 @@ export const fetchData = async () => {
     return console.log(err);
   }
 };
+
+export default fetchData;
